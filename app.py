@@ -38,6 +38,19 @@ def init_db():
         )
     """)
 
+    # حساب الكلية الثابت
+    tvtc_email = "tvtc123@tvtc.edu.sa"
+    existing_user = conn.execute(
+        "SELECT * FROM users WHERE email = ?",
+        (tvtc_email,)
+    ).fetchone()
+
+    if not existing_user:
+        conn.execute(
+            "INSERT INTO users (full_name, email, password) VALUES (?, ?, ?)",
+            ("TVTC User", tvtc_email, "TVTC123.tv")
+        )
+
     conn.commit()
     conn.close()
 
@@ -71,25 +84,6 @@ def is_in_past(date_input, time_input):
     return selected_datetime < datetime.now()
 
 
-def has_conflict(date_input, time_input, appointment_id=None):
-    conn = get_db_connection()
-
-    if appointment_id is None:
-        query = "SELECT * FROM appointments WHERE date = ? AND time = ?"
-        params = (date_input, time_input)
-    else:
-        query = """
-            SELECT * FROM appointments
-            WHERE date = ? AND time = ? AND id != ?
-        """
-        params = (date_input, time_input, appointment_id)
-
-    existing = conn.execute(query, params).fetchone()
-    conn.close()
-
-    return existing is not None
-
-
 @app.route("/")
 def home():
     return redirect(url_for("login"))
@@ -107,21 +101,19 @@ def register():
             return redirect(url_for("register"))
 
         conn = get_db_connection()
-
         try:
             conn.execute(
                 "INSERT INTO users (full_name, email, password) VALUES (?, ?, ?)",
                 (full_name, email, password)
             )
             conn.commit()
+            flash("تم إنشاء الحساب بنجاح")
+            return redirect(url_for("login"))
         except sqlite3.IntegrityError:
-            conn.close()
-            flash("البريد الإلكتروني مستخدم مسبقاً")
+            flash("البريد الإلكتروني مستخدم مسبقًا")
             return redirect(url_for("register"))
-
-        conn.close()
-        flash("تم إنشاء الحساب بنجاح")
-        return redirect(url_for("login"))
+        finally:
+            conn.close()
 
     return render_template("register.html")
 
@@ -144,16 +136,11 @@ def login():
             session["full_name"] = user["full_name"]
             session["email"] = user["email"]
             return redirect(url_for("dashboard"))
-        else:
-            flash("بيانات الدخول غير صحيحة")
+
+        flash("بيانات الدخول غير صحيحة")
+        return redirect(url_for("login"))
 
     return render_template("login.html")
-
-
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect(url_for("login"))
 
 
 @app.route("/dashboard")
@@ -161,7 +148,11 @@ def dashboard():
     if not is_logged_in():
         return redirect(url_for("login"))
 
-    return render_template("dashboard.html", full_name=session["full_name"])
+    return render_template(
+        "dashboard.html",
+        full_name=session.get("full_name"),
+        email=session.get("email")
+    )
 
 
 @app.route("/appointments")
@@ -170,7 +161,7 @@ def appointments():
         return redirect(url_for("login"))
 
     conn = get_db_connection()
-    data = conn.execute(
+    appointments_data = conn.execute(
         "SELECT * FROM appointments WHERE user_id = ? ORDER BY date ASC, time ASC",
         (session["user_id"],)
     ).fetchall()
@@ -181,21 +172,21 @@ def appointments():
     past = []
     calendar_events = []
 
-    for row in data:
+    for appointment in appointments_data:
         appointment_datetime = datetime.strptime(
-            f"{row['date']} {row['time']}",
+            f"{appointment['date']} {appointment['time']}",
             "%Y-%m-%d %H:%M"
         )
 
         if appointment_datetime >= now:
-            upcoming.append(row)
+            upcoming.append(appointment)
         else:
-            past.append(row)
+            past.append(appointment)
 
         calendar_events.append({
-            "id": row["id"],
-            "title": row["time"],
-            "start": f"{row['date']}T{row['time']}:00"
+            "id": appointment["id"],
+            "title": appointment["time"],
+            "start": f"{appointment['date']}T{appointment['time']}:00"
         })
 
     return render_template(
@@ -216,15 +207,11 @@ def book():
         time_input = request.form["time"]
 
         if is_in_past(date_input, time_input):
-            flash("❌ لا يمكن اختيار تاريخ أو وقت في الماضي")
+            flash("لا يمكن اختيار تاريخ أو وقت في الماضي")
             return redirect(url_for("book"))
 
         if not is_within_working_hours(time_input):
-            flash("❌ وقت الحجز خارج ساعات العمل (9:00 صباحاً - 5:00 مساءً)")
-            return redirect(url_for("book"))
-
-        if has_conflict(date_input, time_input):
-            flash("❌ الموعد محجوز مسبقاً")
+            flash("وقت الحجز خارج ساعات العمل")
             return redirect(url_for("book"))
 
         conn = get_db_connection()
@@ -235,8 +222,8 @@ def book():
         conn.commit()
         conn.close()
 
-        flash("✅ تم حجز الموعد بنجاح")
-        return redirect(url_for("book"))
+        flash("تم حجز الموعد بنجاح")
+        return redirect(url_for("appointments"))
 
     return render_template("book.html")
 
@@ -254,7 +241,7 @@ def edit(id):
 
     if not appointment:
         conn.close()
-        flash("❌ الموعد غير موجود")
+        flash("الموعد غير موجود")
         return redirect(url_for("appointments"))
 
     if request.method == "POST":
@@ -263,17 +250,12 @@ def edit(id):
 
         if is_in_past(date_input, time_input):
             conn.close()
-            flash("❌ لا يمكن اختيار تاريخ أو وقت في الماضي")
+            flash("لا يمكن اختيار تاريخ أو وقت في الماضي")
             return redirect(url_for("edit", id=id))
 
         if not is_within_working_hours(time_input):
             conn.close()
-            flash("❌ وقت الحجز خارج ساعات العمل (9:00 صباحاً - 5:00 مساءً)")
-            return redirect(url_for("edit", id=id))
-
-        if has_conflict(date_input, time_input, appointment_id=id):
-            conn.close()
-            flash("❌ يوجد موعد آخر بنفس التاريخ والوقت")
+            flash("وقت الحجز خارج ساعات العمل")
             return redirect(url_for("edit", id=id))
 
         conn.execute(
@@ -283,11 +265,11 @@ def edit(id):
         conn.commit()
         conn.close()
 
-        flash("✅ تم تعديل الموعد بنجاح")
+        flash("تم تعديل الموعد بنجاح")
         return redirect(url_for("appointments"))
 
     conn.close()
-    return render_template("edit.html", data=appointment)
+    return render_template("edit.html", appointment=appointment)
 
 
 @app.route("/delete/<int:id>")
@@ -305,6 +287,12 @@ def delete(id):
 
     flash("تم حذف الموعد")
     return redirect(url_for("appointments"))
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
 
 
 if __name__ == "__main__":
