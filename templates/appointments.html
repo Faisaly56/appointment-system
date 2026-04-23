@@ -4,102 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>المواعيد المحجوزة</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 
     <style>
-        body {
-            background: linear-gradient(135deg, #020617, #0f172a 45%, #1d4ed8);
-            min-height: 100vh;
-            font-family: Tahoma, Arial, sans-serif;
-        }
-
-        .overlay {
-            min-height: 100vh;
-            background: rgba(0, 0, 0, 0.28);
-            padding-bottom: 40px;
-        }
-
-        .navbar {
-            background: rgba(2, 6, 23, 0.85) !important;
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
-
-        .hero-box {
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.92), rgba(37, 99, 235, 0.55));
-            border-radius: 24px;
-            padding: 34px;
-            color: white;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-
-        .hero-box h1 {
-            font-weight: bold;
-            margin-bottom: 12px;
-        }
-
-        .hero-box p {
-            color: #dbeafe;
-            margin-bottom: 18px;
-        }
-
-        .section-card {
-            background: #111827 !important;
-            color: white;
-            border-radius: 22px;
-            border: 1px solid rgba(255,255,255,0.05);
-            box-shadow: 0 14px 30px rgba(0,0,0,0.38);
-            overflow: hidden;
-        }
-
-        .section-title {
-            color: #f8fafc;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        .table {
-            color: #e5e7eb;
-            margin-bottom: 0;
-        }
-
-        .table th {
-            background: #0f172a !important;
-            color: #94a3b8;
-            border-bottom: 1px solid rgba(255,255,255,0.08) !important;
-            border-top: none !important;
-            padding: 16px 12px;
-        }
-
-        .table td {
-            background: transparent !important;
-            color: #e5e7eb;
-            border-bottom: 1px solid rgba(255,255,255,0.05) !important;
-            padding: 16px 12px;
-        }
-
-        .table tbody tr:hover {
-            background: rgba(255,255,255,0.04);
-            transition: 0.2s;
-        }
-
-        .empty-box {
-            padding: 28px;
-            text-align: center;
-            color: #cbd5e1;
-            font-size: 1rem;
-        }
-
-        .badge-custom {
-            font-size: 0.9rem;
-            padding: 8px 12px;
-            border-radius: 10px;
-        }
-
         #calendar {
             background: #111827 !important;
             color: white;
@@ -108,63 +17,38 @@
             box-shadow: 0 14px 30px rgba(0,0,0,0.38);
             border: 1px solid rgba(255,255,255,0.05);
         }
-
-        .fc {
-            color: #e5e7eb !important;
-        }
-
+        .fc { color: #e5e7eb !important; }
         .fc-toolbar-title {
             font-size: 1.3rem !important;
             font-weight: bold;
             color: #f8fafc;
         }
-
         .fc-button {
             background: #1e293b !important;
             border: none !important;
             color: #f8fafc !important;
             box-shadow: none !important;
         }
-
         .fc-button:hover {
             background: #334155 !important;
         }
-
         .fc-button-active {
             background: #facc15 !important;
             color: #111827 !important;
         }
-
-        .fc-col-header-cell {
-            background: #0f172a;
-        }
-
-        .fc-col-header-cell-cushion {
-            color: #cbd5e1 !important;
-            text-decoration: none !important;
-            font-weight: bold;
-            padding: 10px 0;
-        }
-
-        .fc-daygrid-day {
-            background: #111827;
-        }
-
+        .fc-col-header-cell { background: #0f172a; }
+        .fc-col-header-cell-cushion,
         .fc-daygrid-day-number {
             color: #cbd5e1 !important;
             text-decoration: none !important;
         }
-
-        .fc-day-today {
-            background: rgba(250, 204, 21, 0.08) !important;
-        }
-
+        .fc-daygrid-day { background: #111827; }
+        .fc-day-today { background: rgba(250, 204, 21, 0.08) !important; }
         .fc-scrollgrid,
         .fc-theme-standard td,
         .fc-theme-standard th {
             border-color: rgba(255,255,255,0.06) !important;
         }
-
         .fc-event {
             background: #facc15 !important;
             border: none !important;
@@ -174,232 +58,107 @@
             padding: 3px !important;
             cursor: pointer;
         }
-
-        .fc-event:hover {
-            background: #eab308 !important;
+        .hero-box p {
+            color: #dbeafe;
         }
-
-        .fc-event-title {
+        .section-card {
+            background: #111827 !important;
+            color: white;
+            border-radius: 22px;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.38);
+            overflow: hidden;
+        }
+        .section-title {
+            color: #f8fafc;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .badge-custom {
             font-size: 0.9rem;
-            font-weight: bold;
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            border: none;
-            border-radius: 12px;
-            font-weight: bold;
-            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.25);
-        }
-
-        .btn-success:hover {
-            background: linear-gradient(135deg, #16a34a, #15803d);
-        }
-
-        .btn-outline-light {
+            padding: 8px 12px;
             border-radius: 10px;
         }
-
-        .btn-warning {
-            background: #facc15 !important;
-            color: #111827 !important;
-            border: none;
-            border-radius: 9px;
-            font-weight: bold;
-        }
-
-        .btn-warning:hover {
-            background: #eab308 !important;
-        }
-
-        .btn-danger {
-            border-radius: 9px;
-            font-weight: bold;
-        }
-
-        .alert-custom {
-            background: rgba(59, 130, 246, 0.16);
-            color: #dbeafe;
-            border: 1px solid rgba(96, 165, 250, 0.25);
-            border-radius: 14px;
-        }
-
-        .stats-row {
-            margin-bottom: 24px;
-        }
-
-        .stat-card {
-            background: linear-gradient(145deg, #111827, #0f172a);
-            border-radius: 18px;
-            color: white;
-            padding: 20px;
-            border: 1px solid rgba(255,255,255,0.05);
-            box-shadow: 0 10px 24px rgba(0,0,0,0.28);
-            height: 100%;
+        .empty-box {
+            padding: 28px;
             text-align: center;
-        }
-
-        .stat-card h5 {
-            color: #94a3b8;
-            font-size: 0.95rem;
-            margin-bottom: 10px;
-        }
-
-        .stat-card .number {
-            font-size: 1.8rem;
-            font-weight: bold;
-        }
-
-        .stat-card.yellow {
-            background: linear-gradient(145deg, #facc15, #eab308);
-            color: #111827;
-        }
-
-        .stat-card.yellow h5 {
-            color: #3f3f46;
-        }
-
-        .search-box {
-            background: #0f172a;
-            color: white;
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
-            padding: 12px;
-        }
-
-        .search-box:focus {
-            outline: none;
-            border-color: #facc15;
-            box-shadow: 0 0 0 0.2rem rgba(250, 204, 21, 0.12);
+            color: #cbd5e1;
+            font-size: 1rem;
         }
     </style>
 </head>
-
 <body dir="rtl">
-<div class="overlay">
 
-    <nav class="navbar navbar-dark shadow-sm">
-        <div class="container">
-            <span class="navbar-brand fw-bold">المواعيد المحجوزة</span>
-            <div class="d-flex gap-2">
-                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-light btn-sm">الرئيسية</a>
-                <a href="{{ url_for('book') }}" class="btn btn-success btn-sm">حجز موعد</a>
-                <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">تسجيل خروج</a>
+<div class="container py-4 fade-in">
+
+    <div class="navbar-modern d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <span class="fw-bold">المواعيد المحجوزة</span>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-light btn-sm">الرئيسية</a>
+            <a href="{{ url_for('book') }}" class="btn btn-green btn-sm">حجز موعد</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">تسجيل خروج</a>
+        </div>
+    </div>
+
+    <div class="hero-box text-center mb-4">
+        <h1 class="fw-bold mb-2">إدارة المواعيد المحجوزة</h1>
+        <p class="mb-3">من هنا يمكنك عرض المواعيد داخل جدول وتقويم مع إمكانية التعديل والحذف والبحث السريع.</p>
+        <a href="{{ url_for('book') }}" class="btn btn-green btn-lg px-4">+ حجز موعد جديد</a>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="stat-box">
+                <div class="stat-number">{{ upcoming|length + past|length }}</div>
+                <div class="stat-title">إجمالي المواعيد</div>
             </div>
         </div>
-    </nav>
-
-    <div class="container py-5">
-
-        <div class="hero-box text-center mb-4">
-            <h1>إدارة المواعيد المحجوزة</h1>
-            <p>
-                من هنا يمكنك عرض المواعيد داخل جدول وتقويم مع إمكانية التعديل والحذف والبحث السريع.
-            </p>
-
-            <a href="{{ url_for('book') }}" class="btn btn-success btn-lg px-4">
-                + حجز موعد جديد
-            </a>
+        <div class="col-md-4">
+            <div class="stat-box">
+                <div class="stat-number">{{ upcoming|length }}</div>
+                <div class="stat-title">المواعيد القادمة</div>
+            </div>
         </div>
+        <div class="col-md-4">
+            <div class="stat-box">
+                <div class="stat-number">{{ past|length }}</div>
+                <div class="stat-title">المواعيد السابقة</div>
+            </div>
+        </div>
+    </div>
 
-        <div class="row stats-row g-3">
-            <div class="col-md-4">
-                <div class="stat-card">
-                    <h5>إجمالي المواعيد</h5>
-                    <div class="number">{{ upcoming|length + past|length }}</div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, msg in messages %}
+                <div class="alert alert-info alert-modern text-center fw-bold shadow-sm mb-4">
+                    {{ msg }}
                 </div>
-            </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
-            <div class="col-md-4">
-                <div class="stat-card yellow">
-                    <h5>المواعيد القادمة</h5>
-                    <div class="number">{{ upcoming|length }}</div>
-                </div>
-            </div>
+    <div class="mb-4">
+        <input
+            type="text"
+            id="appointmentSearch"
+            class="form-control search-box"
+            placeholder="ابحث بالتاريخ أو الوقت أو الملاحظات..."
+        >
+    </div>
 
-            <div class="col-md-4">
-                <div class="stat-card">
-                    <h5>المواعيد السابقة</h5>
-                    <div class="number">{{ past|length }}</div>
-                </div>
-            </div>
+    <div class="mb-4">
+        <div id="calendar"></div>
+    </div>
+
+    <div class="section-card mb-4">
+        <div class="p-3 border-bottom d-flex justify-content-between align-items-center" style="border-color: rgba(255,255,255,0.06) !important;">
+            <span class="section-title">المواعيد القادمة</span>
+            <span class="badge bg-primary badge-custom">{{ upcoming|length }} موعد</span>
         </div>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, msg in messages %}
-                    <div class="alert alert-custom text-center fw-bold shadow-sm mb-4">
-                        {{ msg }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <div class="mb-4">
-            <input
-                type="text"
-                id="appointmentSearch"
-                class="form-control search-box"
-                placeholder="ابحث بالتاريخ أو الوقت..."
-            >
-        </div>
-
-        <div class="mb-4">
-            <div id="calendar"></div>
-        </div>
-
-        <div class="section-card mb-4">
-            <div class="p-3 border-bottom d-flex justify-content-between align-items-center" style="border-color: rgba(255,255,255,0.06) !important;">
-                <span class="section-title">المواعيد القادمة</span>
-                <span class="badge bg-primary badge-custom">{{ upcoming|length }} موعد</span>
-            </div>
-
-            {% if upcoming %}
-                <div class="table-responsive">
-                    <table class="table table-hover text-center align-middle" id="upcomingTable">
-                        <thead>
-                            <tr>
-                                <th>التاريخ</th>
-                                <th>الوقت</th>
-                                <th>الملاحظات</th>
-                                <th>الإجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for row in upcoming %}
-                            <tr>
-                                <td>{{ row['date'] }}</td>
-                                <td>{{ row['time'] }}</td>
-                                <td>{{ row['notes'] if row['notes'] else '—' }}</td>
-                                <td>
-                                    <a href="{{ url_for('edit', id=row['id']) }}" class="btn btn-warning btn-sm">
-                                        تعديل
-                                    </a>
-                                    <a href="{{ url_for('delete', id=row['id']) }}"
-                                       class="btn btn-danger btn-sm"
-                                       onclick="return confirm('هل أنت متأكد من حذف هذا الموعد؟')">
-                                        حذف
-                                    </a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <div class="empty-box">لا توجد مواعيد قادمة حالياً</div>
-            {% endif %}
-        </div>
-
-        {% if past %}
-        <div class="section-card">
-            <div class="p-3 border-bottom d-flex justify-content-between align-items-center" style="border-color: rgba(255,255,255,0.06) !important;">
-                <span class="section-title">المواعيد السابقة</span>
-                <span class="badge bg-secondary badge-custom">{{ past|length }} موعد</span>
-            </div>
-
+        {% if upcoming %}
             <div class="table-responsive">
-                <table class="table table-hover text-center align-middle" id="pastTable">
+                <table class="table table-modern table-hover text-center align-middle" id="upcomingTable">
                     <thead>
                         <tr>
                             <th>التاريخ</th>
@@ -409,7 +168,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for row in past %}
+                        {% for row in upcoming %}
                         <tr>
                             <td>{{ row['date'] }}</td>
                             <td>{{ row['time'] }}</td>
@@ -419,7 +178,7 @@
                                     تعديل
                                 </a>
                                 <a href="{{ url_for('delete', id=row['id']) }}"
-                                   class="btn btn-danger btn-sm"
+                                   class="btn btn-danger-modern btn-sm"
                                    onclick="return confirm('هل أنت متأكد من حذف هذا الموعد؟')">
                                     حذف
                                 </a>
@@ -429,10 +188,52 @@
                     </tbody>
                 </table>
             </div>
-        </div>
+        {% else %}
+            <div class="empty-box">لا توجد مواعيد قادمة حالياً</div>
         {% endif %}
-
     </div>
+
+    {% if past %}
+    <div class="section-card">
+        <div class="p-3 border-bottom d-flex justify-content-between align-items-center" style="border-color: rgba(255,255,255,0.06) !important;">
+            <span class="section-title">المواعيد السابقة</span>
+            <span class="badge bg-secondary badge-custom">{{ past|length }} موعد</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-modern table-hover text-center align-middle" id="pastTable">
+                <thead>
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>الوقت</th>
+                        <th>الملاحظات</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in past %}
+                    <tr>
+                        <td>{{ row['date'] }}</td>
+                        <td>{{ row['time'] }}</td>
+                        <td>{{ row['notes'] if row['notes'] else '—' }}</td>
+                        <td>
+                            <a href="{{ url_for('edit', id=row['id']) }}" class="btn btn-warning btn-sm">
+                                تعديل
+                            </a>
+                            <a href="{{ url_for('delete', id=row['id']) }}"
+                               class="btn btn-danger-modern btn-sm"
+                               onclick="return confirm('هل أنت متأكد من حذف هذا الموعد؟')">
+                                حذف
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
 </div>
 
 <script>
@@ -444,28 +245,20 @@ document.addEventListener('DOMContentLoaded', function () {
         locale: 'ar',
         direction: 'rtl',
         height: 'auto',
-
         headerToolbar: {
             right: 'prev,next today',
             center: 'title',
             left: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
-
         buttonText: {
             today: 'اليوم',
             month: 'شهر',
             week: 'أسبوع',
             day: 'يوم'
         },
-
-        eventColor: '#facc15',
-        eventTextColor: '#111827',
-
         events: {{ calendar_events | tojson }},
-
         eventClick: function(info) {
             const eventId = info.event.id;
-
             if (eventId) {
                 window.location.href = "/edit/" + eventId;
             }
@@ -475,7 +268,6 @@ document.addEventListener('DOMContentLoaded', function () {
     calendar.render();
 
     const searchInput = document.getElementById('appointmentSearch');
-
     searchInput.addEventListener('keyup', function () {
         const filter = searchInput.value.toLowerCase();
         const tables = ['upcomingTable', 'pastTable'];
